@@ -36,29 +36,30 @@ class _MenuScreenState extends State<MenuScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('MENU')),
       body: Center(
-        child: _menuImage == null
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('No Menu Uploaded'),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _pickMenuImage,
-                    child: const Text('Upload Your Menu'),
-                  ),
-                ],
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.file(_menuImage!),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _removeMenuImage,
-                    child: const Text('Remove Menu'),
-                  ),
-                ],
-              ),
+        child:
+            _menuImage == null
+                ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('No Menu Uploaded'),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _pickMenuImage,
+                      child: const Text('Upload Your Menu'),
+                    ),
+                  ],
+                )
+                : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.file(_menuImage!),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _removeMenuImage,
+                      child: const Text('Remove Menu'),
+                    ),
+                  ],
+                ),
       ),
     );
   }
