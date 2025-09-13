@@ -1,62 +1,54 @@
-Installation & Execution
+🚀 Installation & Execution
 
-1. Prerequisites
-   Flutter SDK (stable channel)
-   Dart (bundled with Flutter)
-   Android Studio (Android SDK / emulator)
-   Xcode (for iOS) – optional
-   Git
-   A Firebase project (console.firebase.google.com)
-2. Clone
-3. Check Environment
-   Fix any reported issues (licenses, missing toolchains, etc.).
+Follow these steps to set up and run the DishDash app on your local machine:
 
-4. Configure Firebase (Recommended via FlutterFire CLI)
-   Install FlutterFire CLI (once):
+1️⃣ Clone the Repository
 
-Login and configure:
+git clone https://github.com/your-username/dishdash.git
+cd dishdash
 
-Select your Firebase project, choose platforms (android, ios, web). This generates lib/firebase_options.dart.
+2️⃣ Install Flutter SDK
 
-If not using FlutterFire CLI manually:
+Make sure you have Flutter
 
-Add google-services.json to app
-Add GoogleService-Info.plist to Runner
-For web, add config to index.html (inside firebase init script) 5. pubspec Dependencies (ensure these exist)
-Get packages:
+flutter doctor
 
-6. Initialize Firebase (main.dart)
-   Ensure your main.dart has:
+3️⃣ Install Dependencies
 
-7. Platform Specific (Android)
-   android/build.gradle (project level) should include:
+flutter pub get
 
-android/app/build.gradle:
+4️⃣ Firebase Setup
 
-Set correct applicationId matching the one registered in Firebase.
+1. Go to Firebase Console
+2. Create or select your Firebase project (dishdash-3136e)
+3. Enable:
 
-8. iOS (if building)
-   Open Runner.xcworkspace in Xcode once so it fetches pods.
-   Run:
-9. Location Permissions
-   Android AndroidManifest.xml (example):
+Authentication → Email/Password
 
-iOS Info.plist (example):
+Cloud Firestore → Start in test mode (then secure later)
 
-10. Run
-    Select a device/emulator.
+Storage → Enable + Update Rules
 
-11. Testing Authentication
-    Use Register User or Register Restaurant screens to create accounts (Firebase Authentication Email/Password must be enabled in Firebase Console).
-    Sign in via Sign In screen.
-12. Hot Reload / Restart
-    Press r (hot reload) or R (hot restart) in terminal while running.
-13. Build Release (Android example)
-    For Play Store, set up signing (key.properties) and update build.gradle.
+Download google-services.json and paste it in android/app/google-services.json
 
-14. Troubleshooting
-    If Firebase errors: confirm firebase_options.dart exists and initializeApp is called.
-    If location fails: ensure emulator has location enabled or grant runtime permissions.
-    If build fails on iOS: run pod repo update then pod install.
-15. Optional: Web
-    Enable web:
+Make sure you have a valid firebase_options.dart file generated using:
+
+flutterfire configure
+
+5️⃣ Google Maps Setup
+
+1. Get a Google Maps API key from Google Cloud Console
+2. Enable Maps SDK for Android
+3. Add your API key in: android/app/src/main/AndroidManifest.xml
+   example:
+   <meta-data
+       android:name="com.google.android.geo.API_KEY"
+       android:value="YOUR_API_KEY_HERE"/>
+
+6️⃣ Run the App
+
+7️⃣ Minimum Requirements
+
+1. Android SDK 23+ (Android 6.0 or higher)
+2. JDK 17+
+3. Flutter 3.16 or newer
