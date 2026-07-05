@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../services/auth_service.dart';
 
 class SigninScreen extends StatefulWidget {
   const SigninScreen({super.key});
@@ -32,14 +33,17 @@ class _SigninScreenState extends State<SigninScreen> {
     });
 
     try {
-      // Firebase Auth sign in
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+      // Firebase Auth sign in, then route based on the account's role.
+      final role = await AuthService.signIn(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
       );
 
-      // Navigate to dashboard after successful login
-      Navigator.pushReplacementNamed(context, '/user-dashboard');
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(
+        context,
+        role == 'owner' ? '/company-dashboard' : '/user-dashboard',
+      );
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -73,7 +77,6 @@ class _SigninScreenState extends State<SigninScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text('Sign In'),
         backgroundColor: const Color(0xFFFF6B35),

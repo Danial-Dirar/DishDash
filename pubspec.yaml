@@ -35,13 +35,20 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   image_picker: ^1.1.2
-  google_maps_flutter: ^2.12.1
+  # Open-source maps (OpenStreetMap) — no API key / billing required
+  flutter_map: ^8.1.1
+  latlong2: ^0.9.1
   location: ^8.0.0
   http: ^1.3.0
   geolocator: ^14.0.0
   provider: ^6.1.5
   firebase_core: ^4.1.0
   firebase_auth: ^6.0.2
+  cloud_firestore: ^6.0.0
+  # Pinned to 10.x so its transitive package_info_plus stays on 8.x, which
+  # builds against this project's Android config. Still exposes the
+  # SharePlus.instance / ShareParams API used in utils/share_helper.dart.
+  share_plus: ">=10.1.0 <11.0.0"
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dish_dash/services/location_service.dart';
+import 'package:dish_dash/services/auth_service.dart';
 
 class RegisterCompanyScreen extends StatefulWidget {
   const RegisterCompanyScreen({super.key});
@@ -113,12 +114,24 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
     });
 
     try {
-      // Firebase Auth registration
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      await AuthService.registerOwner(
+        name: _nameController.text.trim(),
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
+        description: _descriptionController.text.trim(),
+        location: _locationController.text.trim(),
+        contact: _contactController.text.trim().isEmpty
+            ? null
+            : _contactController.text.trim(),
+        website: _websiteController.text.trim().isEmpty
+            ? null
+            : _websiteController.text.trim(),
+        latitude: latitude,
+        longitude: longitude,
+        cuisineTypes: _selectedCuisines,
       );
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -128,8 +141,12 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
         ),
       );
 
-      // Navigate to company dashboard
-      Navigator.pushReplacementNamed(context, '/company-dashboard');
+      // Navigate to owner dashboard
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/company-dashboard',
+        (route) => false,
+      );
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -212,7 +229,6 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text('Register Restaurant'),
         backgroundColor: const Color(0xFFFF6B35),
@@ -412,7 +428,7 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                             style: TextStyle(
                               color: _selectedCuisines.isEmpty
                                   ? Colors.grey
-                                  : Colors.black,
+                                  : Theme.of(context).colorScheme.onSurface,
                               fontSize: 16,
                             ),
                           ),

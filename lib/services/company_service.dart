@@ -1,34 +1,26 @@
-import 'dart:convert';
-import 'api_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/company_model.dart';
 
 class CompanyService {
-  static Future<Map<String, dynamic>> fetchCompanyProfile(
-    String companyId,
-  ) async {
-    final response = await ApiService.getRequest('company/$companyId');
-    return json.decode(response.body);
+  static final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  static DocumentReference<Map<String, dynamic>> _doc(String uid) =>
+      _db.collection('companies').doc(uid);
+
+  static Stream<Company?> stream(String uid) =>
+      _doc(uid).snapshots().map((d) => d.exists ? Company.fromDoc(d) : null);
+
+  static Future<Company?> get(String uid) async {
+    final doc = await _doc(uid).get();
+    return doc.exists ? Company.fromDoc(doc) : null;
   }
 
-  static Future<Map<String, dynamic>> updateCompanyInfo({
-    required String companyId,
-    required String name,
-    required String email,
-    required String password,
-    required String type,
-    required String about,
-    required String latitude,
-    required String longitude,
-  }) async {
-    final response = await ApiService.putRequest('company/$companyId', {
-      'name': name,
-      'email': email,
-      'password': password,
-      'type': type,
-      'about': about,
-      'latitude': latitude,
-      'longitude': longitude,
-    });
+  static Future<void> update(String uid, Map<String, dynamic> data) =>
+      _doc(uid).set(data, SetOptions(merge: true));
 
-    return json.decode(response.body);
-  }
+  /// All restaurants (used for the discovery map/list).
+  static Stream<List<Company>> streamAll() =>
+      _db.collection('companies').snapshots().map(
+        (s) => s.docs.map(Company.fromDoc).toList(),
+      );
 }

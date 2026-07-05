@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../services/auth_service.dart';
 
 class RegisterUserScreen extends StatefulWidget {
   const RegisterUserScreen({super.key});
@@ -49,12 +50,16 @@ class _RegisterUserScreenState extends State<RegisterUserScreen> {
     });
 
     try {
-      // Firebase Auth registration
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      await AuthService.registerFoodie(
+        name: _nameController.text.trim(),
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
+        phone: _phoneController.text.trim().isEmpty
+            ? null
+            : _phoneController.text.trim(),
       );
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Registration successful! Welcome to DishDash!'),
@@ -62,8 +67,12 @@ class _RegisterUserScreenState extends State<RegisterUserScreen> {
         ),
       );
 
-      // Navigate to user dashboard
-      Navigator.pushReplacementNamed(context, '/user-dashboard');
+      // Navigate to foodie dashboard
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/user-dashboard',
+        (route) => false,
+      );
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -90,7 +99,6 @@ class _RegisterUserScreenState extends State<RegisterUserScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text('Create Account'),
         backgroundColor: const Color(0xFFFF6B35),

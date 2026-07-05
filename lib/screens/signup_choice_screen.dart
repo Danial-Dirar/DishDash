@@ -6,7 +6,6 @@ class SignupChoiceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text('Join DishDash'),
         backgroundColor: const Color(0xFFFF6B35),

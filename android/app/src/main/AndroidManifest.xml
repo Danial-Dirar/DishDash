@@ -1,15 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.dish_dash">
 
+    <!-- Required for OpenStreetMap tiles, Firebase, and network image loading -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Required by geolocator for device location -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
-        android:label="dish_dash"
+        android:label="DishDash"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
-
-        <!-- ✅ Google Maps API Key -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCP3i24T0l_pCUFbL_TJLGygOHJS89m1Sk" />
 
         <activity
             android:name=".MainActivity"

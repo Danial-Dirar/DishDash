@@ -1,17 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
+/// Guest browsing screen: shows all registered companies as markers on an
+/// OpenStreetMap map. Tapping a marker shows that company's offers.
 class GuestViewScreen extends StatefulWidget {
-  const GuestViewScreen({Key? key}) : super(key: key);
+  const GuestViewScreen({super.key});
 
   @override
   State<GuestViewScreen> createState() => _GuestViewScreenState();
 }
 
 class _GuestViewScreenState extends State<GuestViewScreen> {
-  late GoogleMapController _mapController;
-  final Set<Marker> _markers = {};
+  static const LatLng _dhaka = LatLng(23.8103, 90.4125);
+
+  final MapController _mapController = MapController();
+  final List<Marker> _markers = [];
+  bool _loading = true;
 
   @override
   void initState() {
@@ -20,37 +26,53 @@ class _GuestViewScreenState extends State<GuestViewScreen> {
   }
 
   Future<void> _loadCompanyMarkers() async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection('companies')
-        .get();
-    final List<Marker> markers = [];
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('companies').get();
 
-    for (var doc in snapshot.docs) {
-      final data = doc.data();
-      final String name = data['name'] ?? 'Unnamed';
-      final double lat = (data['lat'] ?? 0).toDouble();
-      final double lon = (data['lon'] ?? 0).toDouble();
+      final markers = <Marker>[];
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final name = (data['name'] ?? 'Unnamed').toString();
+        final lat = (data['lat'] ?? 0).toDouble();
+        final lon = (data['lon'] ?? 0).toDouble();
+        if (lat == 0 && lon == 0) continue; // skip companies without a location
 
-      markers.add(
-        Marker(
-          markerId: MarkerId(doc.id),
-          position: LatLng(lat, lon),
-          infoWindow: InfoWindow(
-            title: name,
-            onTap: () {
-              _showOffersDialog(doc.id, name);
-            },
+        markers.add(
+          Marker(
+            point: LatLng(lat, lon),
+            width: 44,
+            height: 44,
+            alignment: Alignment.topCenter,
+            child: GestureDetector(
+              onTap: () => _showOffersDialog(doc.id, name),
+              child: const Icon(
+                Icons.restaurant,
+                color: Colors.red,
+                size: 40,
+              ),
+            ),
           ),
-        ),
+        );
+      }
+
+      if (!mounted) return;
+      setState(() {
+        _markers
+          ..clear()
+          ..addAll(markers);
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not load companies: $e')),
       );
     }
-
-    setState(() {
-      _markers.addAll(markers);
-    });
   }
 
-  void _showOffersDialog(String companyId, String companyName) async {
+  Future<void> _showOffersDialog(String companyId, String companyName) async {
     final snapshot = await FirebaseFirestore.instance
         .collection('companies')
         .doc(companyId)
@@ -58,6 +80,7 @@ class _GuestViewScreenState extends State<GuestViewScreen> {
         .orderBy('createdAt', descending: true)
         .get();
 
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (context) {
@@ -68,6 +91,7 @@ class _GuestViewScreenState extends State<GuestViewScreen> {
             child: snapshot.docs.isEmpty
                 ? const Text('No offers available.')
                 : ListView(
+                    shrinkWrap: true,
                     children: snapshot.docs.map((doc) {
                       final data = doc.data();
                       return ListTile(
@@ -79,8 +103,8 @@ class _GuestViewScreenState extends State<GuestViewScreen> {
           ),
           actions: [
             TextButton(
-              child: const Text('Close'),
               onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
             ),
           ],
         );
@@ -92,13 +116,47 @@ class _GuestViewScreenState extends State<GuestViewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Browse as Guest')),
-      body: GoogleMap(
-        initialCameraPosition: const CameraPosition(
-          target: LatLng(23.8103, 90.4125), // Centered on Dhaka
-          zoom: 12,
-        ),
-        markers: _markers,
-        onMapCreated: (controller) => _mapController = controller,
+      body: Stack(
+        children: [
+          FlutterMap(
+            mapController: _mapController,
+            options: const MapOptions(
+              initialCenter: _dhaka,
+              initialZoom: 12,
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.example.dish_dash',
+              ),
+              MarkerLayer(markers: _markers),
+            ],
+          ),
+          if (_loading)
+            const Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: EdgeInsets.all(12),
+                child: Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        SizedBox(width: 12),
+                        Text('Loading restaurants…'),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

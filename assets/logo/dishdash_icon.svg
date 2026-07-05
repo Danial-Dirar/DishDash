@@ -1,0 +1,25 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DishDash icon">
+  <defs>
+    <linearGradient id="brandIcon" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF6B35"/>
+      <stop offset="1" stop-color="#F7931E"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="512" height="512" rx="112" fill="url(#brandIcon)"/>
+  <circle cx="256" cy="248" r="150" fill="#ffffff"/>
+
+  <!-- Fork -->
+  <g fill="#FF6B35">
+    <rect x="214" y="150" width="12" height="52" rx="6"/>
+    <rect x="236" y="150" width="12" height="52" rx="6"/>
+    <rect x="258" y="150" width="12" height="52" rx="6"/>
+    <rect x="216" y="196" width="52" height="20" rx="10"/>
+    <rect x="234" y="212" width="16" height="140" rx="8"/>
+  </g>
+  <!-- Spoon -->
+  <g fill="#FF6B35">
+    <ellipse cx="300" cy="188" rx="30" ry="40"/>
+    <rect x="292" y="216" width="16" height="136" rx="8"/>
+  </g>
+</svg>
